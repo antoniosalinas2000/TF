@@ -10,12 +10,10 @@ const queryClient = new QueryClient()
 
 ReactDOM.render(
   <React.StrictMode>
-    <ChakraProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools />
         <App />
       </QueryClientProvider>
-    </ChakraProvider>
   </React.StrictMode>,
   document.getElementById('root')
 )

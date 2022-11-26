@@ -20,7 +20,7 @@ const EnterName = () => {
   }))
 
   const { mutateAsync } = useMutation(({ username, roomId, uri }) => {
-    return axios.post(`http://localhost:3001/${uri}`, {
+    return axios.post(`http://localhost:3000/${uri}`, {
       username,
       roomId,
     })
@@ -31,7 +31,7 @@ const EnterName = () => {
 
     if (!value) {
       toast({
-        title: 'Please enter your username',
+        title: 'Introducir usuario',
         status: 'error',
         duration: 9000,
         isClosable: true,
@@ -39,13 +39,13 @@ const EnterName = () => {
       return
     }
     await mutateAsync(
-      { username: value, uri: 'create-room-with-user' },
+      { username: value, uri: 'crear-sala' },
       {
         onSuccess: ({ data }) => {
           setRoomId(data.roomId)
           toast({
-            title: 'We created your username, you will find yourself in a room',
-            description: 'Share the room id with anyone',
+            title: 'Hemos creado su sala',
+            description: 'Comparta el id de la sala para colaborar con más personas',
             status: 'success',
             duration: 9000,
             isClosable: true,
@@ -62,7 +62,7 @@ const EnterName = () => {
 
     if (!value || !roomIdValue) {
       toast({
-        title: 'Please enter text in both inputs',
+        title: 'Por favor ingrese datos en ambos campos',
         status: 'error',
         duration: 9000,
         isClosable: true,
@@ -77,27 +77,25 @@ const EnterName = () => {
     <>
       <InputGroup size="lg">
         <Input
-          pr="4.5rem"
           size="lg"
-          placeholder="Enter your name"
+          placeholder="Ingrese su User"
           ref={inputRef}
         />
-        <InputRightElement width="4.5rem">
+        <InputRightElement>
           <Button size="lg" onClick={createRoom}>
-            Go!
+            Crear Sala
           </Button>
         </InputRightElement>
       </InputGroup>
       <InputGroup size="lg">
         <Input
-          pr="4.5rem"
           size="lg"
-          placeholder="Enter a room id"
+          placeholder="Ingrese el id de la Sala"
           ref={roomIdRef}
         />
-        <InputRightElement width="4.5rem">
+        <InputRightElement>
           <Button size="lg" onClick={enterRoom}>
-            Join!
+            Ingresar a la sala
           </Button>
         </InputRightElement>
       </InputGroup>

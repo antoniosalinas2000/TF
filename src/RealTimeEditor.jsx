@@ -33,7 +33,7 @@ const RealTimeEditor = () => {
     // widget.onclick = () => bookMark.clear()
     // console.log(editor.getAllMarks())
 
-    const socket = io('http://localhost:3001/', {
+    const socket = io('http://localhost:3000/', {
       transports: ['websocket'],
     })
 
@@ -77,11 +77,9 @@ const RealTimeEditor = () => {
 
   return (
     <>
-      <Text fontSize="2xl">Your username is: {username}</Text>
-      <Text fontSize="2xl">The room ID is: {roomId}</Text>
-      <Text fontSize="2xl">
-        How many pople are connected: <b> {users.length}</b>
-      </Text>
+      <Text fontSize="16">Tu user es: {username}</Text>
+      <Text fontSize="16">El ID de la sala es: {roomId}</Text>
+      <Text fontSize="16"> Personas conectadas: <b> {users.length}</b></Text>
 
       <textarea id="ds" />
     </>

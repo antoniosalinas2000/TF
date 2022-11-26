@@ -18,70 +18,70 @@ app.use(cors())
 
 client.on('error', console.error)
 client
-  .connect()
-  .then(() => console.log(blueBright.bold('Connected to redis locally!')))
-  .catch(() => {
-    console.error(redBright.bold('Error connecting to redis'))
-  })
+    .connect()
+    .then(() => console.log(blueBright.bold('Connected to local red')))
+    .catch(() => {
+        console.error(redBright.bold('Error connecting to local red'))
+    })
 
 app.get('/', (req, res) => {
-  res.send({ msg: 'hi' })
+    res.send({ msg: 'hi' })
 })
 
-app.post('/create-room-with-user', async (req, res) => {
-  const { username } = req.body
-  const roomId = v4()
+app.post('/crear-sala', async(req, res) => {
+    const { username } = req.body
+    const roomId = v4()
 
-  await client
-    .hSet(`${roomId}:info`, {
-      created: moment(),
-      updated: moment(),
-    })
-    .catch((err) => {
-      console.error(1, err)
-    })
+    await client
+        .hSet(`${roomId}:info`, {
+            created: moment(),
+            updated: moment(),
+        })
+        .catch((err) => {
+            console.error(1, err)
+        })
 
-  // await client.lSet(`${roomId}:users`, [])
+    // await client.lSet(`${roomId}:users`, [])
 
-  res.status(201).send({ roomId })
+    res.status(201).send({ roomId })
 })
 
 io.on('connection', (socket) => {
-  socket.on('CODE_CHANGED', async (code) => {
-    const { roomId, username } = await client.hGetAll(socket.id)
-    const roomName = `ROOM:${roomId}`
-    // io.emit('CODE_CHANGED', code)
-    socket.to(roomName).emit('CODE_CHANGED', code)
-  })
+    socket.on('CODE_CHANGED', async(code) => {
+        const { roomId, username } = await client.hGetAll(socket.id)
+        const roomName = `ROOM:${roomId}`
+            // io.emit('CODE_CHANGED', code)
+        socket.to(roomName).emit('CODE_CHANGED', code)
+    })
 
-  socket.on('DISSCONNECT_FROM_ROOM', async ({ roomId, username }) => {})
+    socket.on('DISSCONNECT_FROM_ROOM', async({ roomId, username }) => {})
 
-  socket.on('CONNECTED_TO_ROOM', async ({ roomId, username }) => {
-    await client.lPush(`${roomId}:users`, `${username}`)
-    await client.hSet(socket.id, { roomId, username })
-    const users = await client.lRange(`${roomId}:users`, 0, -1)
-    const roomName = `ROOM:${roomId}`
-    socket.join(roomName)
-    io.in(roomName).emit('ROOM:CONNECTION', users)
-  })
+    socket.on('CONNECTED_TO_ROOM', async({ roomId, username }) => {
+        await client.lPush(`${roomId}:users`, `${username}`)
+        await client.hSet(socket.id, { roomId, username })
+        const users = await client.lRange(`${roomId}:users`, 0, -1)
+        const roomName = `ROOM:${roomId}`
+        socket.join(roomName)
+        io.in(roomName).emit('ROOM:CONNECTION', users)
+    })
 
-  socket.on('disconnect', async () => {
-    // TODO if 2 users have the same name
-    const { roomId, username } = await client.hGetAll(socket.id)
-    const users = await client.lRange(`${roomId}:users`, 0, -1)
-    const newUsers = users.filter((user) => username !== user)
-    if (newUsers.length) {
-      await client.del(`${roomId}:users`)
-      await client.lPush(`${roomId}:users`, newUsers)
-    } else {
-      await client.del(`${roomId}:users`)
-    }
+    socket.on('disconnect', async() => {
+        // TODO if 2 users have the same name
+        const { roomId, username } = await client.hGetAll(socket.id)
+        const users = await client.lRange(`${roomId}:users`, 0, -1)
+        const newUsers = users.filter((user) => username !== user)
+        if (newUsers.length) {
+            await client.del(`${roomId}:users`)
+            await client.lPush(`${roomId}:users`, newUsers)
+        } else {
+            await client.del(`${roomId}:users`)
+        }
 
-    const roomName = `ROOM:${roomId}`
-    io.in(roomName).emit('ROOM:CONNECTION', newUsers)
-  })
+        const roomName = `ROOM:${roomId}`
+        io.in(roomName).emit('ROOM:CONNECTION', newUsers)
+    })
 })
 
 server.listen(3001, () => {
-  console.log(greenBright.bold('listening on *:3001'))
+    console.log(greenBright.bold('listening on *:3001'))
 })
