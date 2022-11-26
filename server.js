@@ -41,8 +41,6 @@ app.post('/crear-sala', async(req, res) => {
             console.error(1, err)
         })
 
-    // await client.lSet(`${roomId}:users`, [])
-
     res.status(201).send({ roomId })
 })
 
@@ -50,7 +48,6 @@ io.on('connection', (socket) => {
     socket.on('CODE_CHANGED', async(code) => {
         const { roomId, username } = await client.hGetAll(socket.id)
         const roomName = `ROOM:${roomId}`
-            // io.emit('CODE_CHANGED', code)
         socket.to(roomName).emit('CODE_CHANGED', code)
     })
 
@@ -66,7 +63,6 @@ io.on('connection', (socket) => {
     })
 
     socket.on('disconnect', async() => {
-        // TODO if 2 users have the same name
         const { roomId, username } = await client.hGetAll(socket.id)
         const users = await client.lRange(`${roomId}:users`, 0, -1)
         const newUsers = users.filter((user) => username !== user)
